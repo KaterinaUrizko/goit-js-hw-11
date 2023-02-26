@@ -1,105 +1,93 @@
-import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-// import 'simplelightbox/dist/simple-lightbox.min.js';
-// import galleryMarkup from './js/markup.js';
-import LoadMoreBtn from './js/loadMoreBtn.js';
-import NewsApiService from './js/api.js';
+import Notiflix from 'notiflix';
+import fetchImages from './js/fetchImages';
 
-const form = document.getElementById("search-form");
+const searchForm = document.querySelector('#search-form');
 const galleryWrapper = document.querySelector('.gallery');
 const loadBtn = document.querySelector('.load-more');
-
 const lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
 });
 
-const newsApiService = new NewsApiService();
-// const loadMoreBtn = new LoadMoreBtn({
-//   selector: '.load-more',
-//   isHidden: true,
-// });
+let perPage = 40;
+let page = 10;
+let query = '';
 
-console.log(newsApiService);
-console.log(loadBtn);
+searchForm.addEventListener('submit', onSubmit);
+loadBtn.addEventListener('click', loadPictures);
 
-form.addEventListener('submit', onSubmit);
-loadBtn.button.addEventListener('click', fetchArticles);
+loadBtnHide();
 
 function onSubmit(e) {
   e.preventDefault();
 
   const form = e.currentTarget;
-    const value = form.elements.searchQuery.value.trim();
+  query = form.elements.searchQuery.value.trim();
 
-     if (value ==='')
-       return Notiflix.Notify.warning(
-         'Please enter a search query.'
-       );
-    
-    newsApiService.searchQuery = value;
-    
+  if (query === '')
+    return Notiflix.Notify.warning('Please enter a search query.');
 
-  newsApiService.resetPage();
+  console.log(query, page);
+
+  resetPage();
   clearGalery();
-
-  fetchArticles().finally(() => form.reset());
+  loadPictures().finally(() => form.reset());
 }
 
-async function fetchArticles() {
+async function loadPictures() {
+  try {
+    const images = await fetchImages(query, page);
+    const hits = images.hits;
+    const totalHits = images.totalHits;
+    const totalPages = totalHits / perPage;
+    console.log('🚀 ~ hits', hits, totalHits);
+    console.log(
+      'query-',
+      query,
+      'page-',
+      page,
+      'totalhits',
+      totalHits,
+      'totalpages',
+      totalPages
+    );
 
-   try {
-      const data = await newsApiService.getPictures();
-      const hits = data.hits;
-    const totalHits = data.totalHits;
-      console.log('🚀 ~ hits', hits,  totalHits );
-  
-    //   console.log(`total Hits`, totalHits);
-    //   if (hits.length === 0) throw new Error('No data');
-      if (hits.length === 0) {
-          Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.'
-          );
-          return;
-      }
-    
+    if (hits.length === 0) {
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      return;
+    }
 
-    //   if(totalHits<40) { loadMoreBtn.hide()} ;
+    if (totalHits <= perPage) {
+      loadBtnHide();
+    }
 
-    
-      
-    //   console.log(data.totalHits);
-      
-    //   const markup = hits.reduce(
-    //   (markup, hit) => galleryMarkup(hit) + markup,
-    //   ''
-    // );
-        // loadMoreBtn.show();
+    if (totalHits <= page * perPage) {
+      loadBtnHide();
+      Notiflix.Notify.info(
+        "We're sorry, but you've reached the end of search results."
+      );
+      return;
+    }
 
-      const markup = hits.reduce(
-          (markup, hit => galleryMarkup(hit) + markup,
-              ''
-          ));
-       
-      appendPicToGallery(markup);
+    const markup = hits.reduce(
+      (markup, hit) => galleryMarkup(hit) + markup,
+      ''
+    );
 
-    // appendPicToGallery(markup);
-    //   loadMoreBtn.enable();
-      lightbox(refresh);
+    appendPicToGallery(markup);
+
+    loadBtnShow();
+
+    nextPage();
+    lightbox.refresh();
   } catch (err) {
     console.error(err);
   }
-
 }
-
-
-function onError(err) {
-  console.error(err);
-  loadMoreBtn.hide();
-  appendNewsToList('<p>Articles not found</p>');
-}
-
-
 function galleryMarkup({
   webformatURL,
   largeImageURL,
@@ -134,7 +122,18 @@ function galleryMarkup({
 function appendPicToGallery(markup) {
   galleryWrapper.insertAdjacentHTML('beforeend', markup);
 }
-
 function clearGalery() {
   galleryWrapper.innerHTML = '';
+}
+function nextPage() {
+  page += 1;
+}
+function resetPage() {
+  page = 1;
+}
+function loadBtnShow() {
+  loadBtn.style.display = 'block';
+}
+function loadBtnHide() {
+  loadBtn.style.display = 'none';
 }
