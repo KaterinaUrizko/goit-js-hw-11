@@ -12,7 +12,7 @@ const lightbox = new SimpleLightbox('.gallery a', {
 });
 
 let perPage = 40;
-let page = 10;
+let page = 1;
 let query = '';
 
 searchForm.addEventListener('submit', onSubmit);
