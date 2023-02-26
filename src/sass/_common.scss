@@ -6,11 +6,21 @@ img {
     width: 400px;
     height: 280px;
     border-radius: 3%;
-   
+            
 }
+//  img {
+//     width: 100%;
+//         border-radius: 15px;}
 
 a {
     text-decoration: none;
+}
+
+html {
+
+    min-height: 100%;
+
+    background: radial-gradient(circle 610px at 5.2% 51.6%, rgb(241, 223, 255) 0%, rgb(225, 225, 255) 97.5%) no-repeat fixed;
 }
 
 p {
@@ -83,18 +93,28 @@ button {
 
 
 .photo-card {
-    width: 30%;
+max-width: 400px;
+max-height: 100%
+;
     text-align: center;
     border-radius: 15px;
     background-color: #c1c1c1;
     padding: 20px;
 }
 
-
+// .photo-card {
+//     height: 100%;
+//         flex-direction: column;
+//         justify-content: space-evenly;
+//             text-align: center;
+//         display: flex;
+//             border-radius: 15px;
+//                 background-color: #c1c1c1;
+// }
 
 .info{
     display: flex;
-            justify-content: center;
+            // justify-content: center;
             align-items: center;
             gap: 15px;
             padding: 8px;
