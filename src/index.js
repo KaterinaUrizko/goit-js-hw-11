@@ -29,30 +29,15 @@ function onSubmit(e) {
   if (query === '')
     return Notiflix.Notify.warning('Please enter a search query.');
 
-  console.log(query, page);
-
   resetPage();
   clearGalery();
   loadPictures().finally(() => form.reset());
 }
-
 async function loadPictures() {
   try {
     const images = await fetchImages(query, page);
     const hits = images.hits;
     const totalHits = images.totalHits;
-    const totalPages = totalHits / perPage;
-    console.log('🚀 ~ hits', hits, totalHits);
-    console.log(
-      'query-',
-      query,
-      'page-',
-      page,
-      'totalhits',
-      totalHits,
-      'totalpages',
-      totalPages
-    );
 
     if (hits.length === 0) {
       Notiflix.Notify.failure(
@@ -119,7 +104,6 @@ function galleryMarkup({
   </div>
 </div>`;
 }
-
 function appendPicToGallery(markup) {
   galleryWrapper.insertAdjacentHTML('beforeend', markup);
 }
