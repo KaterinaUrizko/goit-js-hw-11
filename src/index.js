@@ -65,7 +65,6 @@ async function loadPictures() {
 
     if (totalHits < perPage) {
       loadBtnHide();
-      Notiflix.Notify.info(`We have found for you only ${totalHits} pictures`);
     }
 
     if (totalHits < page * perPage && totalHits > 40) {
