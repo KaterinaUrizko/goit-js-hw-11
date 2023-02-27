@@ -61,11 +61,14 @@ async function loadPictures() {
       return;
     }
 
-    if (totalHits <= perPage) {
+    loadBtnShow();
+
+    if (totalHits < perPage) {
       loadBtnHide();
+      Notiflix.Notify.info(`We have found for you only ${totalHits} pictures`);
     }
 
-    if (totalHits <= page * perPage) {
+    if (totalHits < page * perPage && totalHits > 40) {
       loadBtnHide();
       Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
@@ -77,10 +80,9 @@ async function loadPictures() {
       (markup, hit) => galleryMarkup(hit) + markup,
       ''
     );
+    Notiflix.Notify.info(`We have found for you ${totalHits} pictures`);
 
     appendPicToGallery(markup);
-
-    loadBtnShow();
 
     nextPage();
     lightbox.refresh();
