@@ -14,6 +14,7 @@ const lightbox = new SimpleLightbox('.gallery a', {
 let perPage = 40;
 let page = 1;
 let query = '';
+let totalHits = 0;
 
 searchForm.addEventListener('submit', onSubmit);
 loadBtn.addEventListener('click', loadPictures);
@@ -37,7 +38,7 @@ async function loadPictures() {
   try {
     const images = await fetchImages(query, page);
     const hits = images.hits;
-    const totalHits = images.totalHits;
+    totalHits = images.totalHits;
 
     if (hits.length === 0) {
       Notiflix.Notify.failure(
@@ -48,6 +49,10 @@ async function loadPictures() {
 
     loadBtnShow();
 
+    if (page === 1) {
+      Notiflix.Notify.info(`We have found for you ${totalHits} pictures`);
+    }
+
     if (totalHits < perPage) {
       loadBtnHide();
     }
@@ -57,14 +62,12 @@ async function loadPictures() {
       Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
-      return;
     }
 
     const markup = hits.reduce(
       (markup, hit) => galleryMarkup(hit) + markup,
       ''
     );
-    Notiflix.Notify.info(`We have found for you ${totalHits} pictures`);
 
     appendPicToGallery(markup);
 
